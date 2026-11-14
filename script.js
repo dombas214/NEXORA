@@ -15,19 +15,17 @@ const videos = [
 ];
 function renderVideos(filter="all"){
  const list=videos.filter(v=>filter==="all"||v[1]===filter);
+ const unlocked=!!window.nexoraSession;
  if(!list.length){$("#videoGrid").innerHTML='<p class="video-empty">В этой категории пока нет видео.</p>';return;}
  $("#videoGrid").innerHTML=list.map((v)=>`<article class="video-card" data-video-id="${v[3]}">
-  <div class="video-thumb">
-   <button class="video-launch" type="button" aria-label="Смотреть: ${v[0]}">
-    <img loading="lazy" src="https://i.ytimg.com/vi/${v[3]}/hqdefault.jpg" alt="Обложка видео: ${v[0]}">
-    <span class="play-icon">▶</span>
-   </button>
-  </div>
-  <div class="video-info"><small>${v[2].toUpperCase()}</small><h3>${v[0]}</h3><p>${v[4]}</p><span class="video-action">Смотреть на сайте ▶</span></div>
+  <div class="video-thumb">${unlocked?`<button class="video-launch" type="button" aria-label="Смотреть: ${v[0]}"><img loading="lazy" src="https://i.ytimg.com/vi/${v[3]}/hqdefault.jpg" alt="Обложка видео: ${v[0]}"><span class="play-icon">▶</span></button>`:`<div class="video-locked"><b>🔒 Видео для участников NEXORA</b><span>Войди или создай аккаунт, чтобы смотреть</span><button type="button" class="video-auth-open">Войти / Регистрация</button></div>`}</div>
+  <div class="video-info"><small>${v[2].toUpperCase()}</small><h3>${v[0]}</h3><p>${v[4]}</p><span class="video-action">${unlocked?'Смотреть на сайте ▶':'Доступ после входа 🔒'}</span></div>
  </article>`).join("");
 }
+
 renderVideos();
 $("#videoGrid").addEventListener("click",e=>{
+ if(e.target.closest(".video-auth-open")){window.nexoraOpenAuth?.();return;}
  const launch=e.target.closest(".video-launch");
  if(!launch)return;
  const card=launch.closest(".video-card");
@@ -123,3 +121,58 @@ $("#orderForm").addEventListener("submit",async e=>{
   btn.disabled=false;btn.innerHTML='Отправить заявку <b>↗</b>';
  }
 });
+
+
+// Supabase Auth for NEXORA. The publishable key is intended for browser use; protect data with RLS.
+(function initNexoraAuth(){
+ const SUPABASE_URL = "https://qsmilwubedkzmewmwmxt.supabase.co";
+ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_x2q0ttoqkC3S3SN24_Z9kQ_TEH3ga9G";
+ const overlay=document.getElementById("authOverlay");
+ const form=document.getElementById("authForm");
+ if(!window.supabase || !overlay || !form){console.error("Supabase client or auth UI did not load");return;}
+ const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+ let mode="login";
+ const status=document.getElementById("authStatus");
+ const open=()=>{overlay.hidden=false;status.textContent="";document.getElementById("authEmail").focus();};
+ const close=()=>{overlay.hidden=true;};
+ window.nexoraOpenAuth=open;
+ document.getElementById("authOpen").addEventListener("click",open);
+ document.getElementById("authClose").addEventListener("click",close);
+ overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
+ document.getElementById("authSwitch").addEventListener("click",()=>{
+  mode=mode==="login"?"signup":"login";
+  document.getElementById("authTitle").textContent=mode==="login"?"Вход в аккаунт":"Создать аккаунт";
+  document.getElementById("authSubtitle").textContent=mode==="login"?"Войди, чтобы открыть обучающие видео.":"Зарегистрируйся, чтобы получить доступ к базе знаний NEXORA.";
+  document.getElementById("authSubmit").textContent=mode==="login"?"Войти":"Зарегистрироваться";
+  document.getElementById("authSwitch").textContent=mode==="login"?"Нет аккаунта? Зарегистрироваться":"Уже есть аккаунт? Войти";
+  document.getElementById("authNameLabel").hidden=mode!=="signup";
+  document.getElementById("authName").required=mode==="signup";
+  document.getElementById("authPassword").autocomplete=mode==="login"?"current-password":"new-password";
+  status.textContent="";
+ });
+ form.addEventListener("submit",async e=>{
+  e.preventDefault();const email=document.getElementById("authEmail").value.trim();const password=document.getElementById("authPassword").value;
+  const submit=document.getElementById("authSubmit");submit.disabled=true;status.textContent=mode==="login"?"Входим…":"Создаём аккаунт…";
+  try{
+   let result;
+   if(mode==="signup"){
+    const fullName=document.getElementById("authName").value.trim();
+    result=await client.auth.signUp({email,password,options:{data:{full_name:fullName},emailRedirectTo:window.location.origin}});
+    if(result.error)throw result.error;
+    if(!result.data.session){status.textContent="Аккаунт создан! Проверь почту и подтверди адрес, затем войди.";status.style.color="#b7ff5c";return;}
+   }else{result=await client.auth.signInWithPassword({email,password});if(result.error)throw result.error;}
+   await refreshSession();close();
+  }catch(err){status.textContent=err.message||"Не удалось выполнить вход. Попробуй ещё раз.";status.style.color="#ffbd78";}
+  finally{submit.disabled=false;}
+ });
+ async function refreshSession(){
+  const {data}=await client.auth.getSession();window.nexoraSession=data.session||null;
+  const loginBtn=document.getElementById("authOpen"),userBtn=document.getElementById("accountUser");
+  if(data.session){loginBtn.hidden=true;userBtn.hidden=false;userBtn.textContent=(data.session.user.user_metadata?.full_name||data.session.user.email)+" · Выйти";}
+  else{loginBtn.hidden=false;userBtn.hidden=true;}
+  userBtn.onclick=async()=>{if(confirm("Выйти из аккаунта NEXORA?")){await client.auth.signOut();await refreshSession();}};
+  const activeFilter=document.querySelector(".filter.active")?.dataset.filter||"all";renderVideos(activeFilter);
+ }
+ client.auth.onAuthStateChange(()=>{refreshSession();});
+ refreshSession();
+})();

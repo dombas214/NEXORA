@@ -28,7 +28,9 @@
 .video-empty{grid-column:1/-1;color:#9ba8bd;font-size:12px}
 @media(max-width:700px){.video-launch,.video-launch img{min-height:120px}}
 
-  </style>
+  
+.account-actions{display:flex;align-items:center;gap:8px}.account-user{max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}.auth-overlay{position:fixed;inset:0;z-index:100;background:#050914df;display:grid;place-items:center;padding:18px;backdrop-filter:blur(12px)}.auth-overlay[hidden]{display:none}.auth-modal{position:relative;width:min(100%,430px);background:#151f33;border:1px solid #ffffff22;border-radius:18px;padding:32px;box-shadow:0 25px 90px #0009}.auth-close{position:absolute;right:16px;top:12px;border:0;background:none;color:#dce4f1;font-size:28px;cursor:pointer}.auth-modal h2{font-size:28px;margin:12px 0 8px}.auth-subtitle{color:#9ba8bd;font-size:12px;line-height:1.6;margin:0 0 22px}.auth-modal label{display:block;color:#dce4f1;font-size:10px;font-weight:700;margin:14px 0}.auth-modal input{display:block;width:100%;margin-top:8px;background:#0e1728;border:1px solid #ffffff22;border-radius:8px;color:#fff;padding:14px;outline:none}.auth-modal input:focus{border-color:#b7ff5c}.auth-status{font-size:11px;line-height:1.5;min-height:18px;color:#b7ff5c}.auth-switch{border:0;background:none;color:#b7ff5c;font-size:11px;cursor:pointer;padding:8px 0}.video-locked{height:100%;min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:linear-gradient(135deg,#1d2a41,#101827);color:#b7ff5c;text-align:center;padding:15px}.video-locked b{font-size:12px}.video-locked span{font-size:10px;color:#aab7cc}.video-locked button{border:1px solid #b7ff5c;background:#b7ff5c;color:#0b1020;border-radius:20px;padding:8px 14px;font-size:10px;font-weight:800;cursor:pointer}.video-launch{display:block;width:100%;height:100%;position:relative;border:0;padding:0;background:#101827;cursor:pointer}.video-launch img{display:block;width:100%;height:100%;object-fit:cover}.video-launch .play-icon{pointer-events:none}.video-note-auth{color:#b7ff5c}
+</style>
 </head>
 <body>
 <header class="header">
@@ -36,7 +38,7 @@
   <nav class="nav" id="nav">
     <a href="#catalog">Каталог</a><a href="#builder">Сборка ПК</a><a href="#laptops">Подбор ноутбука</a><a href="#learn">Гайды</a><a href="#contacts">Контакты</a>
   </nav>
-  <a class="header-cta" href="#order">Оставить заявку <span>↗</span></a>
+  <div class="account-actions"><button class="header-cta" id="authOpen" type="button">Войти / Регистрация <span>↗</span></button><button class="header-cta account-user" id="accountUser" type="button" hidden></button></div>
   <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">☰</button>
 </header>
 
@@ -152,5 +154,23 @@
 </main>
 
 <footer class="footer" id="contacts"><a class="brand" href="#home"><span class="brand-mark">N</span><span>NEXORA<span class="brand-dot">.</span><small>TECH STORE</small></span></a><p>Техника, которая подходит именно тебе.</p><div class="footer-right"><a href="#catalog">Каталог</a><a href="#builder">Сборка ПК</a><a href="#laptops">Ноутбуки</a><span>© 2026 NEXORA</span></div></footer>
+
+<div class="auth-overlay" id="authOverlay" hidden>
+  <section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <button class="auth-close" id="authClose" type="button" aria-label="Закрыть">×</button>
+    <div class="section-kicker">NEXORA ACCOUNT</div>
+    <h2 id="authTitle">Вход в аккаунт</h2>
+    <p class="auth-subtitle" id="authSubtitle">Войди, чтобы открыть обучающие видео.</p>
+    <form id="authForm">
+      <label>Электронная почта<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
+      <label>Пароль<input id="authPassword" type="password" minlength="6" autocomplete="current-password" required placeholder="Минимум 6 символов"></label>
+      <label id="authNameLabel" hidden>Имя<input id="authName" type="text" autocomplete="name" placeholder="Как тебя зовут?"></label>
+      <button class="btn btn-primary btn-full" id="authSubmit" type="submit">Войти</button>
+      <p class="auth-status" id="authStatus" role="status"></p>
+    </form>
+    <button class="auth-switch" id="authSwitch" type="button">Нет аккаунта? Зарегистрироваться</button>
+  </section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
 </body></html>
