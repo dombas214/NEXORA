@@ -1,34 +1,56 @@
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
-// 15 тематических материалов. Сейчас карточки ведут на соответствующий поиск YouTube.
-// Для встроенного проигрывания замени youtubeSearch на конкретный videoId и используй iframe embed.
+// Подборка реальных роликов YouTube. Видео загружается в плеер прямо на сайте по нажатию.
 const videos = [
- ["Как собрать игровой ПК с нуля","pc","Сборка ПК","сборка игрового пк с нуля пошагово"],
- ["Как правильно выбрать блок питания","pc","Сборка ПК","как выбрать блок питания для компьютера"],
- ["Сборка компьютера: порядок действий","pc","Сборка ПК","сборка компьютера пошаговая инструкция"],
- ["Как выбрать корпус и охлаждение","pc","Сборка ПК","как выбрать корпус и охлаждение пк"],
- ["Как выбрать ноутбук для учёбы","laptop","Ноутбуки","как выбрать ноутбук для учебы"],
- ["Игровой ноутбук: на что смотреть","laptop","Ноутбуки","как выбрать игровой ноутбук характеристики"],
- ["Процессор ноутбука: объяснение","laptop","Ноутбуки","процессоры ноутбуков объяснение"],
- ["Как выбрать экран ноутбука","laptop","Ноутбуки","как выбрать экран ноутбука матрица герцовка"],
- ["Чем отличаются видеокарты RTX","parts","Комплектующие","видеокарты nvidia rtx объяснение"],
- ["Оперативная память: сколько нужно","parts","Комплектующие","сколько оперативной памяти нужно пк"],
- ["SSD или HDD: в чём разница","parts","Комплектующие","ssd или hdd в чем разница"],
- ["Как выбрать материнскую плату","parts","Комплектующие","как выбрать материнскую плату"],
- ["Как правильно чистить компьютер","care","Уход и настройка","как правильно почистить компьютер от пыли"],
- ["Как установить Windows и драйверы","care","Уход и настройка","установка windows драйверов инструкция"],
- ["Как снизить нагрев ноутбука","care","Уход и настройка","как снизить нагрев ноутбука советы"]
-];
-const thumbs = [
- "photo-1587202372775-e229f172b9d7","photo-1593640408182-31c70c8268f5","photo-1587831990711-23ca6441447b",
- "photo-1591488320449-011701bb6704","photo-1496181133206-80ce9b88a853","photo-1588872657578-7efd1f1555ed"
+ ["Как собрать игровой ПК с нуля","pc","Сборка ПК","FJlLtksMGiA","Пошаговый гайд по подбору комплектующих и сборке игрового компьютера."],
+ ["Полная сборка ПК своими руками","pc","Сборка ПК","hr-siRhvApM","Подробная сборка компьютера: от установки процессора до Windows и драйверов."],
+ ["Как выбрать блок питания","pc","Сборка ПК","mLgZdCF4NvQ","Мощность, разъёмы, форм-фактор и сертификат 80 PLUS."],
+ ["Как выбрать ноутбук для дома и игр","laptop","Ноутбуки","wSdqpFl2bzg","Разбираем типы ноутбуков и выбираем устройство под свои задачи."],
+ ["Как выбрать игровой ноутбук по характеристикам","laptop","Ноутбуки","ujtXeLNCXaQ","На что смотреть в процессоре, памяти, экране и охлаждении."],
+ ["Как выбрать комплектующие для ПК","parts","Комплектующие","McNiJkL1zUQ","Процессор, материнская плата, память, накопитель, охлаждение и видеокарта."],
+ ["DDR4 или DDR5: какую память выбрать","parts","Комплектующие","g5YQQIEEY5Y","Сравнение поколений оперативной памяти и объёма ОЗУ."],
+ ["SSD или HDD: в чём разница","parts","Комплектующие","61agcZlPpsg","Как устроены накопители и какой вариант выбрать."],
+ ["Как выбрать видеокарту","parts","Комплектующие","mWp5HjLGkjY","Короткий видеоматериал о видеопамяти и её влиянии на игры."]
 ];
 function renderVideos(filter="all"){
  const list=videos.filter(v=>filter==="all"||v[1]===filter);
- $("#videoGrid").innerHTML=list.map((v,i)=>`<article class="video-card"><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(v[3])}" target="_blank" rel="noopener"><div class="video-thumb"><img loading="lazy" src="https://images.unsplash.com/${thumbs[i%thumbs.length]}?auto=format&fit=crop&w=700&q=75" alt=""><span class="play-icon">▶</span></div><div class="video-info"><small>${v[2].toUpperCase()}</small><h3>${v[0]}</h3><span>Найти видео на YouTube ↗</span></div></a></article>`).join("");
+ if(!list.length){$("#videoGrid").innerHTML='<p class="video-empty">В этой категории пока нет видео.</p>';return;}
+ $("#videoGrid").innerHTML=list.map((v)=>`<article class="video-card" data-video-id="${v[3]}">
+  <div class="video-thumb">
+   <button class="video-launch" type="button" aria-label="Смотреть: ${v[0]}">
+    <img loading="lazy" src="https://i.ytimg.com/vi/${v[3]}/hqdefault.jpg" alt="Обложка видео: ${v[0]}">
+    <span class="play-icon">▶</span>
+   </button>
+  </div>
+  <div class="video-info"><small>${v[2].toUpperCase()}</small><h3>${v[0]}</h3><p>${v[4]}</p><span class="video-action">Смотреть на сайте ▶</span></div>
+ </article>`).join("");
 }
 renderVideos();
+$("#videoGrid").addEventListener("click",e=>{
+ const launch=e.target.closest(".video-launch");
+ if(!launch)return;
+ const card=launch.closest(".video-card");
+ const id=card.dataset.videoId;
+ const thumb=card.querySelector(".video-thumb");
+ const title=card.querySelector("h3")?.textContent||"Видео NEXORA";
+ const embedUrl = new URL(`https://www.youtube.com/embed/${encodeURIComponent(id)}`);
+ embedUrl.searchParams.set("autoplay", "1");
+ embedUrl.searchParams.set("rel", "0");
+ embedUrl.searchParams.set("playsinline", "1");
+ // YouTube Error 153 occurs when the embedded player receives no HTTP Referer.
+ embedUrl.searchParams.set("origin", window.location.origin);
+ thumb.innerHTML=`<iframe src="${embedUrl.href}" title="${title.replace(/\"/g,"&quot;")}" loading="eager" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="origin" allowfullscreen></iframe><button class="video-close" type="button" aria-label="Закрыть видео">✕</button>`;
+});
+$("#videoGrid").addEventListener("click",e=>{
+ const close=e.target.closest(".video-close");
+ if(!close)return;
+ const card=close.closest(".video-card");
+ const id=card.dataset.videoId;
+ const title=card.querySelector("h3")?.textContent||"Видео";
+ const thumb=card.querySelector(".video-thumb");
+ thumb.innerHTML=`<button class="video-launch" type="button" aria-label="Смотреть: ${title}"><img loading="lazy" src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="Обложка видео: ${title}"><span class="play-icon">▶</span></button>`;
+});
 $$(".filter").forEach(b=>b.addEventListener("click",()=>{$$(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderVideos(b.dataset.filter)}));
 $("#menuToggle").addEventListener("click",()=>$("#nav").classList.toggle("open"));
 $$(".nav a").forEach(a=>a.addEventListener("click",()=>$("#nav").classList.remove("open")));

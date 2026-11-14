@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1020">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>NEXORA — компьютеры и ноутбуки</title>
   <meta name="description" content="Подбор ноутбуков и сборка компьютеров под ваши задачи. NEXORA — техника без компромиссов.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +15,18 @@
 @media(max-width:950px){.nav{gap:14px}.nav a{font-size:10px}.section{padding:80px 6%}.hero{padding-left:6%;padding-right:6%}.hero-art{height:400px}.hero-img{height:320px}.category-grid{grid-template-columns:1fr 1fr}.category-card:last-child{grid-column:span 2;min-height:260px}.builder-section,.learn-section{padding-left:6%;padding-right:6%}.survey-section{gap:35px}.order-section{gap:35px}.footer{padding-left:6%;padding-right:6%}}
 @media(max-width:700px){.header{height:68px;padding:0 5%}.nav{display:none;position:absolute;top:68px;left:0;right:0;background:#10182a;padding:20px 6%;flex-direction:column;border-bottom:1px solid #ffffff20}.nav.open{display:flex}.nav a{font-size:13px}.header-cta{margin-left:auto;margin-right:15px;font-size:10px;padding:10px 12px}.menu-toggle{display:block}.section{padding:65px 5%}.hero{display:flex;flex-direction:column;align-items:stretch;padding-top:60px;padding-bottom:85px}.hero h1{font-size:58px;letter-spacing:-3px}.hero-art{height:340px;margin-top:25px}.hero-img{width:90%;height:270px}.hero-caption{left:9%;bottom:20px}.hero-bottom{left:5%;right:5%}.section-heading{display:block}.section-heading h2,.survey-copy h2,.order-info h2{font-size:42px}.section-heading p{margin-top:18px}.category-grid{grid-template-columns:1fr}.category-card,.category-card:last-child{grid-column:auto;min-height:300px}.config-layout,.laptop-picker,.survey-section,.order-section{grid-template-columns:1fr}.config-panel,.config-summary,.picker-form,.order-form{padding:20px}.picker-visual{min-height:280px}.video-grid{grid-template-columns:1fr 1fr}.video-thumb{height:120px}.survey-section{gap:30px}.survey-card{padding:22px}.order-section{gap:30px}.footer{align-items:flex-start;flex-direction:column;padding:30px 5%}.footer-right{flex-wrap:wrap;gap:15px}.ticker{font-size:9px}.choice-grid{gap:7px}.choice{padding:11px 9px}.choice small{font-size:8px}}
 @media(max-width:420px){.header-cta{display:none}.hero h1{font-size:51px}.video-grid{grid-template-columns:1fr}.video-thumb{height:170px}.form-heading{display:block}.form-heading span{display:block;margin-top:5px}}
+
+
+.video-thumb{height:auto;aspect-ratio:16/9;position:relative;background:#080d17}
+.video-thumb iframe{display:block;width:100%;height:100%;aspect-ratio:16/9;border:0}
+.video-launch{display:block;position:relative;width:100%;height:100%;min-height:145px;padding:0;border:0;background:#080d17;cursor:pointer}
+.video-launch img{display:block;width:100%;height:100%;min-height:145px;object-fit:cover;opacity:.82;transition:.25s}
+.video-launch:hover img{opacity:1;transform:scale(1.025)}
+.video-info p{font-size:10px;line-height:1.6;color:#9ba8bd;margin:0 0 10px}
+.video-action{font-size:9px;color:#b7ff5c;font-weight:800}
+.video-close{position:absolute;top:8px;right:8px;width:30px;height:30px;border:1px solid #ffffff50;border-radius:50%;background:#080d17dd;color:#fff;cursor:pointer;z-index:2}
+.video-empty{grid-column:1/-1;color:#9ba8bd;font-size:12px}
+@media(max-width:700px){.video-launch,.video-launch img{min-height:120px}}
 
   </style>
 </head>
@@ -109,9 +122,9 @@
 <section class="section learn-section" id="learn">
   <div class="section-kicker">04 / БАЗА ЗНАНИЙ</div>
   <div class="section-heading"><h2>Разбирайся в технике.<br><span>Выбирай уверенно.</span></h2><p>Подборка тем и видео, которые помогут понять характеристики компьютеров и ноутбуков.</p></div>
-  <div class="filter-row" id="videoFilters"><button class="filter active" data-filter="all">Все темы</button><button class="filter" data-filter="pc">Сборка ПК</button><button class="filter" data-filter="laptop">Ноутбуки</button><button class="filter" data-filter="parts">Комплектующие</button><button class="filter" data-filter="care">Уход и настройка</button></div>
+  <div class="filter-row" id="videoFilters"><button class="filter active" data-filter="all">Все темы</button><button class="filter" data-filter="pc">Сборка ПК</button><button class="filter" data-filter="laptop">Ноутбуки</button><button class="filter" data-filter="parts">Комплектующие</button></div>
   <div class="video-grid" id="videoGrid"></div>
-  <p class="video-note">Видеоматериалы открываются на YouTube. Для встраивания конкретных роликов непосредственно на сайт добавьте их YouTube ID в массив videos в файле <code>script.js</code>.</p>
+  <p class="video-note">Нажмите на обложку, чтобы посмотреть видео прямо на сайте. Если автор запретил встраивание ролика, он может быть недоступен во встроенном плеере.</p>
 </section>
 
 <section class="section survey-section">
