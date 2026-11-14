@@ -1,6 +1,5 @@
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-const workerUrl = "ВСТАВЬ_URL_CLOUDFLARE_WORKER"; // Например: https://nexora-form.<имя>.workers.dev
 
 // 15 тематических материалов. Сейчас карточки ведут на соответствующий поиск YouTube.
 // Для встроенного проигрывания замени youtubeSearch на конкретный videoId и используй iframe embed.
@@ -67,19 +66,16 @@ $("#surveyNext").addEventListener("click",()=>{if(!answers[qIndex])return;if(qIn
 drawQuestion();
 
 async function sendPayload(payload){
- if(!workerUrl || workerUrl.includes("ВСТАВЬ_URL")){
-  throw new Error("Не указан URL Cloudflare Worker. В script.js замени workerUrl на адрес опубликованного Worker.");
- }
  const controller = new AbortController();
  const timeout = setTimeout(()=>controller.abort(),15000);
  try {
-  const r=await fetch(workerUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:controller.signal});
+  const r=await fetch("/api/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:controller.signal});
   const data=await r.json().catch(()=>({}));
   if(!r.ok||!data.ok) throw new Error(data.error||`Ошибка отправки (${r.status}). Попробуй ещё раз.`);
   return data;
  } catch(err) {
   if(err.name==="AbortError") throw new Error("Сервер долго не отвечает. Проверь интернет и попробуй ещё раз.");
-  if(err instanceof TypeError) throw new Error("Не удалось связаться с Cloudflare Worker. Проверь URL Worker и настройки доступа.");
+  if(err instanceof TypeError) throw new Error("Не удалось связаться с сервером сайта. Проверь публикацию Cloudflare Pages Functions.");
   throw err;
  } finally { clearTimeout(timeout); }
 }
